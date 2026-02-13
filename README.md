@@ -197,7 +197,7 @@ proxmox-secure-lab/
 
 **Tom Daluzeau** — Alternant Administrateur Systèmes & DevOps
 
-- LinkedIn : [Tom Daluzeau](https://linkedin.com/in/tom-daluzeau)
+- LinkedIn : [Tom Daluzeau](https://www.linkedin.com/in/daluzeautom/)
 
 ---
 
