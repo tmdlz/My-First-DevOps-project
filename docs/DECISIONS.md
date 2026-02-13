@@ -233,6 +233,43 @@ Les containers LXC natifs Proxmox sont utilisés en priorité pour tous les serv
 
 ---
 
+## ADR-007 — Exegol (Docker) au lieu de Kali Linux (VM)
+
+**Date** : 12 février 2026
+**Statut** : Accepté
+
+### Contexte
+
+L'architecture initiale prévoyait une VM Kali Linux (2 Go RAM) isolée sur le VLAN 40 (DMZ) pour les tests de sécurité. Avec seulement 8 Go de RAM sur le PC 1, ces 2 Go représentent 25% des ressources totales pour un outil utilisé ponctuellement.
+
+### Décision
+
+Remplacer la VM Kali par Exegol, un environnement de pentest français basé sur Docker, lancé à la demande depuis un container LXC dédié.
+
+### Alternatives considérées
+
+| Alternative | Description | Raison de l'écart |
+|-------------|-------------|-------------------|
+| Kali Linux VM | 2 Go RAM, noyau complet, VLAN 40 isolé | Isolation parfaite mais trop gourmand en RAM pour un usage ponctuel |
+| Exegol Docker | Quelques centaines de Mo, images spécialisées : light/full/web/AD/OSINT | Léger, démarrage rapide, outils identiques, projet open source français actif |
+| Outils installés manuellement | nmap, nikto, etc. sur un LXC | Pas de cohérence, maintenance difficile |
+
+### Conséquences
+
+**Gains :**
+- ~1.5 à 2 Go de RAM libérés, suppression du VLAN 40 dédié
+- Images spécialisées (web, AD, OSINT) au lieu d'un OS monolithique
+- Reproductibilité totale (`docker pull` = même environnement à chaque fois)
+
+**Compromis :**
+- L'isolation réseau doit être gérée via la configuration Docker (`--network`) au lieu d'un VLAN physique dédié. **Mitigation** : créer un réseau Docker isolé avec des règles iptables strictes
+- Docker doit être installé sur le lab (dépendance supplémentaire)
+
+**Risques :**
+- Certains outils bas niveau (injection de paquets, scan ARP) peuvent nécessiter `--privileged` ou `--net=host`, ce qui réduit l'isolation
+
+---
+
 ## Index des ADR
 
 | ID | Titre | Statut | Date |
@@ -243,3 +280,4 @@ Les containers LXC natifs Proxmox sont utilisés en priorité pour tous les serv
 | ADR-004 | Woodpecker CI plutôt que Drone CI | ✅ Accepté | 2026-02-10 |
 | ADR-005 | ext4 plutôt que ZFS | ✅ Accepté | 2026-02-10 |
 | ADR-006 | LXC natif plutôt que Docker partout | ✅ Accepté | 2026-02-10 |
+| ADR-007 | Exegol (Docker) au lieu de Kali Linux (VM) | ✅ Accepté | 2026-02-12 |
